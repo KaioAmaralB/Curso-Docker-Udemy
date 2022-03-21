@@ -1,0 +1,49 @@
+# Versão Docker Compose
+version: '3.3'
+
+# Serviços da minha aplicação
+# Ele está indentado por ser um objeto (YAML/YML)
+services:
+  # Container de MySQL
+  db: 
+    # FROM mysql:5.7
+    image: mysql:5.7 
+    # Volume para os dados serem salvos
+    # No caso seria uma lista de volumes
+    volumes:
+      - db_data:/var/lib/mysql
+    # Todas as alterações serem atualizadas automaticamente
+    restart: always
+    # Onde se encontra o arquivo de configuração
+    env_file:
+      - ./config/db.env
+    # Definindo a network
+    networks:
+      - backend
+
+  # Configuração do workpress, que seria nossa aplicação WEB
+  wordpress:
+    # Quais serviços que o WordPress depende
+    depends_on:
+      - db
+    # A imagem que vou utilizar
+    image: wordpress:latest
+    # Expondo a porta
+    ports:
+     - "8000:80"
+    # Sempre que alterar ele irá atualizar
+    restart: always
+    # Onde se encontra o arquivo de configuração
+    env_file:
+      - ./config/wb.env
+    # Definindo a network
+    networks:
+      - backend
+
+# Salvar dentro do volume
+volumes:
+  db_data: {}
+#Inicializando a network
+networks:
+  backend:
+    driver: bridge
